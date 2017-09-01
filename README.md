@@ -220,7 +220,7 @@ As you can see, `TreeGrid` takes a tuple array and the generator returned by `ge
 
 Now execute it and check that the results... are exactly the same as before. But hey! now we can get the results in other formats too. Try json for example (It'll output a minified JSON, I've beautified it):
 
-    $ python vol.py --plugins=<myplugin-dir> -f <vmcore> --profile=<vmcore-profile> myplugin
+    $ python vol.py --plugins=<myplugin-dir> -f <vmcore> --profile=<vmcore-profile> myplugin --output=json
     Volatility Foundation Volatility Framework 2.6
     {
     "rows":[
