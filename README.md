@@ -80,7 +80,7 @@ Now we create a file for the plugin. Note that the name you give this file will 
 vim myplugin.py
 ```
 
-Ok, I was kidding, I'm not using vim for this. Any text editor will do: gedit, atom, VS Code, sublime, etc.
+Ok, I was kidding, I'm not using vim for this. Any text editor will do: gedit, [ATOM](https://atom.io/), [VS Code](https://code.visualstudio.com/), [Sublime Text](https://www.sublimetext.com/), etc.
 
 #### The basics
 We're going to do this the right way: Write the minimum for the plugin to run and build up from it. This would be the simplest working plugin:
