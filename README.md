@@ -29,12 +29,12 @@ Now `cd` to volatility's folder and execute a couple or two... wait! We don't ha
 
 ### Get a memory dump
 
-You can get a memory dump in multiple ways, we'll leverage virtualization and use VirtualBox to easily get a VM's memory dump. A more extense version of this process can be found [here](https://andreafortuna.org/how-to-extract-a-ram-dump-from-a-running-virtualbox-machine-b803f9fd2a0), but, long story short:
+You can get a memory dump in multiple ways, we'll leverage virtualization and use VirtualBox to easily get a VM's memory dump. A more extensive version of this process can be found [here](https://andreafortuna.org/how-to-extract-a-ram-dump-from-a-running-virtualbox-machine-b803f9fd2a0), but, long story short:
  - Boot up a virtual machine in VirtualBox and note it's name.
  - `$ vboxmanage debugvm <VM-NAME> dumpvmcore --filename vm.elf`
  - That's it.
 
-Well, this is not a memory dump per se. It's a `.elf` that also contains other data from VirtualBox we don't need. Guess what? Volatility doesn't care. If you really want a raw memory dump go check out the more extense version.
+Well, this is not a memory dump per se. It's a `.elf` that also contains other data from VirtualBox we don't need. Guess what? Volatility doesn't care. If you really want a raw memory dump go check out the more extensive version.
 
 ### Analyze memory dump
 Now we get to look into the memory dump. We have all we need so `cd` to volatility's folder and execute `pslist` command like this:
@@ -62,7 +62,7 @@ Since I extracted a Windows 7 SP1 x64 memory dump, I would run:
     0xffffc480b630d080 winlogon.exe            516    448      5        0      1      0 2017-07-13 18:18:42 UTC+0000
     ...
 
-`pslist` is such a trivial command, it simply lists all running processes. But don't be fooled, volatility has quite a set of useful commands wich can be found [here](https://github.com/volatilityfoundation/volatility/wiki/Command-Reference).
+`pslist` is such a trivial command, it simply lists all running processes. But don't be fooled, volatility has quite a set of useful commands which can be found [here](https://github.com/volatilityfoundation/volatility/wiki/Command-Reference).
 
 ### What's a Volatility plugin?
 You want to develop a plugin for volatility, but, do you know what a plugin is? The first thing to know here is: **EVERYTHING IS A PLUGIN**. Yes, there're plugins developed by regular people - you and me - and the ones developed by The Volatility Foundation, that are included in Volatility. The so-called volatility commands are nothing more than plugins, `pslist` is a plugin. The plugin you'll create will be invoked almost the same way we used `pslist`. 
@@ -92,7 +92,7 @@ We're going to do this the right way: Write the minimum for the plugin to run an
 
 Let me elaborate:
  - `class MyPlugin(common.AbstractWindowsCommand)`: This is the class that Volatility instantiates when you run the plugin. It **must** inherit from one of the `common.Command` subclases, I've chosen `common.AbstractWindowsCommand` because my plugin will be Windows-oriented.
- - `def render_text(self, outfd, data)`: This is the called function for presenting the results in plain text format. **outfd** is the file descriptor to which Volatility will write, by default it's `stdout` but you can give it with `--outpu-file`. We didn't do any work so, after (not) doing all the thigs my plugin does, it's called and prints `Hello world!` to `stdout`. You can tell the plugin to present the results in plain text, dot, JSON or even a formated HTML document but we'll get to that later.
+ - `def render_text(self, outfd, data)`: This is the called function for presenting the results in plain text format. **outfd** is the file descriptor to which Volatility will write, by default it's `stdout` but you can give it with `--output-file`. We didn't do any work so, after (not) doing all the things my plugin does, it's called and prints `Hello world!` to `stdout`. You can tell the plugin to present the results in plain text, dot, JSON or even a formated HTML document but we'll get to that later.
 
 Now we can run it with:
 
@@ -100,14 +100,14 @@ Now we can run it with:
 $ python vol.py --plugins=<myplugin-dir> -f <vm-dump> --profile=<vm-profile> myplugin
 ```
 
-Note that the `--plugins` argument **must** be passed right after `vol.py`, doing it elsewere wont' work. Also, the path provided must be absolute:
+Note that the `--plugins` argument **must** be passed right after `vol.py`, doing it elsewhere wont' work. Also, the path provided must be absolute:
 
  - This is good: `python vol.py --plugins=/home/user/volpydev/myplugin -f <vmcore> myplugin`
  - This is not:  `python vol.py -f <vmcore> --plugins=/home/user/volpydev/myplugin myplugin`
  - This isn't either: `python vol.py --plugins=volpydev/myplugin -f <vmcore> myplugin`
 
 #### The not-so-basics
-Now we're going to make something with that memory dump and output somethig more useful than `Hello world!`. Take this code:
+Now we're going to make something with that memory dump and output something more useful than `Hello world!`. Take this code:
 
     import volatility.plugins.common as common
     import volatility.utils as utils
@@ -125,11 +125,11 @@ Now we're going to make something with that memory dump and output somethig more
             for task in data:
                 outfd.write("{!s}\n".format(str(task)))
 
-Important thigs here:
+Important things here:
 
  - `''' My plugin'''`: This docstring will be written when calling your plugin with `-h` (or `--help`)
  - `def calculate(self)`: Here is where we do the real work, the returned data will be passed as `data` to `render_text`. What we are doing is getting a list with all the running processes in the given memory dump's address space and return it. `render_text` will iterate over that list and print whatever `str(task)` returns (It happens to be the virtual offset of the process' _EPROCESS internal structure, but that's not important right now).
- - `self._config`: This is the cofigiguration object built for a single specific run of Volatility, it identifies the given memory dump's address space. It also contains other data such as passed arguments.
+ - `self._config`: This is the configuration object built for a single specific run of Volatility, it identifies the given memory dump's address space. It also contains other data such as passed arguments.
 
 Now you can run it and see what it prints:
 
@@ -145,7 +145,7 @@ Now you can run it and see what it prints:
     2247164976
     ...
 
-This looks good, but we can do better! Let's print somethig that we can understand, take this `render_text` function:
+This looks good, but we can do better! Let's print something that we can understand, take this `render_text` function:
 
     def render_text(self, outfd, data):
         for task in data:
@@ -167,12 +167,12 @@ This will print every process's PID next to it's name. Go check it!
     604 svchost.exe
     ...
 
-Now we're talking! This is great but, what if you want the results in greptext for an easier prcessing? Or even an sqlite3 database? We'll need the **unified output** for that, let's find out how!
+Now we're talking! This is great but, what if you want the results in greptext for an easier processing? Or even an sqlite3 database? We'll need the **unified output** for that, let's find out how!
 
 #### Unified Output
-Here we learn how to print the right way. `render_text()` works for a quick fix but, if we want our plugin to offer the best we need `unifed_output()`. This will centralize all the presenting results stuff into one function - actually two. However, if you want to do somethig "special" when printing on any specific format you can always define `render_x()` - where x is any of the [available formats](https://github.com/volatilityfoundation/volatility/wiki/Unified-Output#standard-renderers) - and do it as you like. Defining `render_x()` actually overrides the default printing function. We've already done that, remember?
+Here we learn how to print the right way. `render_text()` works for a quick fix but, if we want our plugin to offer the best we need `unifed_output()`. This will centralize all the presenting results stuff into one function - actually two. However, if you want to do something "special" when printing on any specific format you can always define `render_x()` - where x is any of the [available formats](https://github.com/volatilityfoundation/volatility/wiki/Unified-Output#standard-renderers) - and do it as you like. Defining `render_x()` actually overrides the default printing function. We've already done that, remember?
 
-As I said, it's not just one function, but two: `unified_output()` and `generator()`. The latter will provide `unified_output()` a generator with the data and `unified_output()` will return a `TreeGrid` object with that data and it's structure. An example is worth a thousang words, so:
+As I said, it's not just one function, but two: `unified_output()` and `generator()`. The latter will provide `unified_output()` a generator with the data and `unified_output()` will return a `TreeGrid` object with that data and it's structure. An example is worth a thousand words, so:
 
     def generator(self, data):
         for task in data:
@@ -241,7 +241,7 @@ Now execute it and check that the results... are exactly the same as before. But
     }
 
 #### Other interesting things
-Now we're doing useful work and using unified outpu, what else can we do? I'll teach you a couple interesting things but the best way to learn is by doing!
+Now we're doing useful work and using unified output, what else can we do? I'll teach you a couple interesting things but the best way to learn is by doing!
 
 ##### Parameters
 A nice way to give your plugin some life is by taking parameters. We're gonna use the `__init__()` function for this. For example, we want to give our plugin a prefix for all processes' names. Why? Why not! Here's how we do it:
@@ -267,7 +267,7 @@ This how we define a new parameter:
  - `short_option = 'P'`: Why write `--prefix <prefix>` when we can do it shorter: `-P <prefix>`.
  - `default = None`: If no PREFIX parameter given, self._config.PREFIX will be whatever we put here. In this case: `None`
  - `help = 'Prefix all names'`: This is what will be written about this parameter when running the plugin with `-h` - or `--help` -.
- - `action = 'store'`: This indicates that the parameter takes a value behind, the prefix in this case. Instead of `store` you can use `store_true` (giving the paramter will make it store True, or False) or `append` (multiple parameters will stack: -P hehe -P you ) too.
+ - `action = 'store'`: This indicates that the parameter takes a value behind, the prefix in this case. Instead of `store` you can use `store_true` (giving the parameter will make it store True, or False) or `append` (multiple parameters will stack: -P hehe -P you ) too.
 
 
 ##### Use other plugins from inside yours
@@ -299,4 +299,4 @@ You need to build a `ConfObject`, just like the one that Volatility gives you in
 
 ## Other community plugins
 
-A nice way to learn and see what others can come up with wile developing a plugin is navigatin through the [Community Plugins GitHub](https://github.com/volatilityfoundation/community).
+A nice way to learn and see what others can come up with wile developing a plugin is navigation through the [Community Plugins GitHub](https://github.com/volatilityfoundation/community).
